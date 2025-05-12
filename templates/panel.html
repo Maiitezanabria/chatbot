@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de la Rotisería</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f8f8f8; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        table, th, td { border: 1px solid #ccc; }
+        th, td { padding: 10px; text-align: left; }
+        form { background-color: #fff; padding: 15px; border-radius: 8px; width: 400px; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; margin-bottom: 15px; }
+        button { padding: 10px 20px; }
+    </style>
+</head>
+<a href="/productos">📋 Ver Productos y Variantes</a>
+
+<body>
+    <h1>Menú del Día</h1>
+
+    <a href="/agregar_menu">Agregar nuevo menú</a>
+
+    <h2>Menús cargados</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Producto</th>
+            <th>Variante</th>
+            <th>Fecha</th>
+        </tr>
+    {% for menu in menus %}
+<tr>
+    <td>{{ menu[0] }}</td>
+    <td>{{ menu[1] }}</td>
+    <td>{{ menu[2] }}</td>
+    <td>{{ menu[3] }}</td>
+    <td>
+        <form method="POST" action="/eliminar_menu/{{ menu[0] }}" style="display:inline;">
+            <button type="submit" onclick="return confirm('¿Estás seguro de eliminar este menú?')">Eliminar</button>
+        </form>
+    </td>
+</tr>
+{% endfor %}
+
+    </table>
+</body>
+
+</html>
