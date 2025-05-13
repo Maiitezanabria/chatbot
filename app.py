@@ -99,6 +99,10 @@ def eliminar_menu(id):
     conn.close()
     return redirect('/panel')
 
+@app.route('/')
+def inicio():
+    return render_template('inicio.html')
+
 
 if __name__ == '__main__':
     import os
