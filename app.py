@@ -3,9 +3,12 @@
 from flask import Flask, render_template, request, redirect
 import psycopg2
 
+
 # Configuración de la base de datos PostgreSQL
+#DATABASE_URL = 'postgres://postgres:101214@localhost:5432/rotiseria'
+
 import os
-DATABASE_URL = os.environ.get('DATABASE_URL')
+DATABASE_URL = os.getenv('DATABASE_URL')
 
 
 app = Flask(__name__)
@@ -101,3 +104,5 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
+ #app.run(debug=True)
