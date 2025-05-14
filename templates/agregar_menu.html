@@ -1,41 +1,25 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Agregar al Menú del Día</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f8f8f8; }
-        form { background-color: #fff; padding: 15px; border-radius: 8px; width: 400px; margin-bottom: 30px; }
-        input, select { width: 100%; padding: 8px; margin-top: 5px; margin-bottom: 15px; }
-        button { padding: 10px 20px; }
-    </style>
-</head>
-<body>
-    <h1>Agregar al Menú del Día</h1>
+@app.route('/agregar_menu', methods=['GET', 'POST'])
+def agregar_menu():
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-    <form method="POST" action="/agregar_menu">
-        <label for="producto_id">Producto:</label>
-        <select id="producto_id" name="producto_id" required>
-            <option value="">Seleccione un producto</option>
-            {% for producto in productos %}
-                <option value="{{ producto[0] }}">{{ producto[1] }}</option>
-            {% endfor %}
-        </select>
+    cursor.execute('SELECT id, nombre FROM productos')
+    productos = cursor.fetchall()
 
-        <label for="variante_id">Variante:</label>
-        <select id="variante_id" name="variante_id" required>
-            <option value="">Seleccione una variante</option>
-            {% for variante in variantes_producto %}
-                <option value="{{ variante[0] }}">{{ variante[1] }}</option>
-            {% endfor %}
-        </select>
+    if request.method == 'POST':
+        producto_id = request.form['producto_id']
+        fecha = request.form['fecha']
 
-        <label for="fecha">Fecha:</label>
-        <input type="date" id="fecha" name="fecha" required>
+        cursor.execute('''
+            INSERT INTO menu_del_dia (producto_id, fecha) 
+            VALUES (%s, %s)
+        ''', (producto_id, fecha))
 
-        <button type="submit">Agregar</button>
-    </form>
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return redirect('/panel')
 
-    <a href="/panel">Volver al Panel</a>
-</body>
-</html>
+    cursor.close()
+    conn.close()
+    return render_template('agregar_menu.html', productos=productos)
