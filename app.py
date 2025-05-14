@@ -19,16 +19,19 @@ def get_db_connection():
     return conn
 
 @app.route('/productos')
-def productos_variantes():
+def productos():
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute('''
-        SELECT p.nombre, v.nombre_variacion, v.precio, v.disponible
+        SELECT p.nombre, p.descripcion, p.precio, p.disponibilidad
         FROM productos p
-        JOIN variantes_producto v ON p.id = v.producto_id
-        ORDER BY p.nombre, v.nombre_variacion
+        ORDER BY p.nombre
     ''')
+    lista = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('productos.html', lista=lista)
 
     lista = cursor.fetchall()
     cursor.close()
@@ -40,54 +43,43 @@ def agregar_menu():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Obtener los productos y variantes
     cursor.execute('SELECT id, nombre FROM productos')
     productos = cursor.fetchall()
 
-    cursor.execute('SELECT id, nombre_variacion FROM variantes_producto')
-    variantes = cursor.fetchall()
-
     if request.method == 'POST':
-        # Obtener los valores seleccionados
         producto_id = request.form['producto_id']
-        variante_id = request.form['variante_id']
         fecha = request.form['fecha']
 
-        # Insertar en la base de datos
         cursor.execute('''
-            INSERT INTO menu_del_dia (producto_id, variante_id, fecha) 
-            VALUES (%s, %s, %s)
-        ''', (producto_id, variante_id, fecha))
+            INSERT INTO menu_del_dia (producto_id, fecha) 
+            VALUES (%s, %s)
+        ''', (producto_id, fecha))
 
         conn.commit()
         cursor.close()
         conn.close()
-
         return redirect('/panel')
 
-    return render_template('agregar_menu.html', productos=productos, variantes_producto=variantes)
+    cursor.close()
+    conn.close()
+    return render_template('agregar_menu.html', productos=productos)
 
 @app.route('/panel')
 def panel():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Actualización de la consulta para obtener también el nombre de la variante
     cursor.execute('''
-        SELECT m.id, p.nombre, v.nombre_variacion, m.fecha
+        SELECT m.id, p.nombre, m.fecha
         FROM menu_del_dia m
         JOIN productos p ON m.producto_id = p.id
-        JOIN variantes_producto v ON m.variante_id = v.id
+        ORDER BY m.fecha DESC
     ''')
     menus = cursor.fetchall()
 
-    cursor.execute('SELECT id, nombre FROM productos')
-    productos = cursor.fetchall()
-
     cursor.close()
     conn.close()
-
-    return render_template('panel.html', menus=menus, productos=productos)
+    return render_template('panel.html', menus=menus)
 
 @app.route('/eliminar_menu/<int:id>', methods=['POST'])
 def eliminar_menu(id):

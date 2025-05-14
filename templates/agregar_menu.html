@@ -1,25 +1,25 @@
-@app.route('/agregar_menu', methods=['GET', 'POST'])
-def agregar_menu():
-    conn = get_db_connection()
-    cursor = conn.cursor()
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar al Menú del Día</title>
+</head>
+<body>
+    <h1>Agregar producto al menú del día</h1>
+    <form action="/agregar_menu" method="post">
+        <label for="producto_id">Producto:</label>
+        <select name="producto_id" required>
+            {% for p in productos %}
+            <option value="{{ p[0] }}">{{ p[1] }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <label for="fecha">Fecha:</label>
+        <input type="date" name="fecha" required>
+        <br><br>
+        <button type="submit">Agregar</button>
+    </form>
+    <a href="/panel">Volver al panel</a>
+</body>
+</html>
 
-    cursor.execute('SELECT id, nombre FROM productos')
-    productos = cursor.fetchall()
-
-    if request.method == 'POST':
-        producto_id = request.form['producto_id']
-        fecha = request.form['fecha']
-
-        cursor.execute('''
-            INSERT INTO menu_del_dia (producto_id, fecha) 
-            VALUES (%s, %s)
-        ''', (producto_id, fecha))
-
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return redirect('/panel')
-
-    cursor.close()
-    conn.close()
-    return render_template('agregar_menu.html', productos=productos)

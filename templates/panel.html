@@ -1,16 +1,31 @@
-@app.route('/panel')
-def panel():
-    conn = get_db_connection()
-    cursor = conn.cursor()
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel del Menú del Día</title>
+</head>
+<body>
+    <h1>Menú del día</h1>
+    <table border="1">
+        <tr>
+            <th>Producto</th>
+            <th>Fecha</th>
+            <th>Acción</th>
+        </tr>
+        {% for m in menus %}
+        <tr>
+            <td>{{ m[1] }}</td>
+            <td>{{ m[2] }}</td>
+            <td>
+                <form action="/eliminar_menu/{{ m[0] }}" method="post" onsubmit="return confirm('¿Estás seguro de eliminar este menú?');">
+                    <button type="submit">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="/agregar_menu">Agregar nuevo menú</a> |
+    <a href="/">Volver al inicio</a>
+</body>
+</html>
 
-    cursor.execute('''
-        SELECT m.id, p.nombre, m.fecha
-        FROM menu_del_dia m
-        JOIN productos p ON m.producto_id = p.id
-        ORDER BY m.fecha DESC
-    ''')
-    menus = cursor.fetchall()
-
-    cursor.close()
-    conn.close()
-    return render_template('panel.html', menus=menus)
