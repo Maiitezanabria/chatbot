@@ -3,11 +3,12 @@
 from flask import Flask, render_template, request, redirect
 import psycopg2
 
-from dotenv import load_dotenv
+
+
+# Configuración de la base de datos PostgreSQL
+#DATABASE_URL = 'postgres://postgres:101214@localhost:5432/rotiseria'
+
 import os
-
-load_dotenv()  # carga las variables definidas en .env
-
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 
