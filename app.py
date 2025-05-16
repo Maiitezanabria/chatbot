@@ -9,7 +9,7 @@ import psycopg2
 #DATABASE_URL = 'postgres://postgres:101214@localhost:5432/rotiseria'
 
 import os
-DATABASE_URL = os.getenv ("postgresql://rotiseria_db_user:YxkD1Ah8Z5IROmTQfVYUa2eYjiYUGBlJ@dpg-d0i1j86mcj7s739jtjcg-a.render.com/rotiseria_db")
+DATABASE_URL = os.getenv ("postgresql://rotiseria_db_user:YxkD1Ah8Z5IROmTQfVYUa2eYjiYUGBlJ@dpg-d0i1j86mcj7s739jtjcg-a.oregon-postgres.render.com/rotiseria_db")
 
 
 app = Flask(__name__)
