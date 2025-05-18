@@ -21,24 +21,32 @@ def get_db_connection():
     conn = psycopg2.connect(DATABASE_URL, client_encoding='UTF8')
     return conn
 
-@app.route('/productos')
-def productos():
+from collections import defaultdict
+
+@app.route('/panel')
+def panel():
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute('''
-        SELECT p.nombre, p.descripcion, p.precio, p.disponibilidad,
-               c.nombre AS categoria, u.nombre AS unidad
-        FROM productos p
-        JOIN categorias c ON p.categoria_id = c.id
+        SELECT p.nombre, p.descripcion, u.nombre AS unidad, p.precio, m.fecha
+        FROM menu_del_dia m
+        JOIN productos p ON m.producto_id = p.id
         JOIN unidades u ON p.unidad_id = u.id
-        ORDER BY p.nombre
+        ORDER BY p.nombre, p.descripcion, u.nombre
     ''')
-
-    lista = cursor.fetchall()
+    rows = cursor.fetchall()
     cursor.close()
     conn.close()
-    return render_template('productos.html', lista=lista)
+
+    # Agrupar por (nombre, descripcion)
+    menus = defaultdict(list)
+    for nombre, descripcion, unidad, precio, fecha in rows:
+        key = (nombre, descripcion)
+        menus[key].append({'unidad': unidad, 'precio': precio, 'fecha': fecha})
+
+    return render_template('panel.html', menus=menus)
+
 
 
 
