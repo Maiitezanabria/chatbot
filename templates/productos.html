@@ -6,22 +6,26 @@
 </head>
 <body>
     <h1>Lista de productos</h1>
-    <table border="1">
-        <tr>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Precio</th>
-            <th>Disponible</th>
-        </tr>
-        {% for p in lista %}
-        <tr>
-            <td>{{ p[0] }}</td>
-            <td>{{ p[1] }}</td>
-            <td>${{ p[2] }}</td>
-            <td>{{ 'Sí' if p[3] else 'No' }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+   <table border="1">
+    <tr>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Precio</th>
+        <th>Disponible</th>
+        <th>Categoría</th>
+        <th>Unidad</th>
+    </tr>
+    {% for p in lista %}
+    <tr>
+        <td>{{ p[0] }}</td>
+        <td>{{ p[1] }}</td>
+        <td>${{ "%.2f"|format(p[2]) }}</td>
+        <td>{{ 'Sí' if p[3] else 'No' }}</td>
+        <td>{{ p[4] }}</td> <!-- Categoría -->
+        <td>{{ p[5] }}</td> <!-- Unidad -->
+    </tr>
+    {% endfor %}
+</table>
     <a href="/">Volver al inicio</a>
 </body>
 </html>

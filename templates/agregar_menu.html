@@ -10,7 +10,7 @@
         <label for="producto_id">Producto:</label>
         <select name="producto_id" required>
             {% for p in productos %}
-            <option value="{{ p[0] }}">{{ p[1] }}</option>
+            <option value="{{ p[0] }}">{{ p[1] }} - {{ p[2] }}</option>
             {% endfor %}
         </select>
         <br><br>

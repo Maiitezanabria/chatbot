@@ -27,26 +27,28 @@ def productos():
     cursor = conn.cursor()
 
     cursor.execute('''
-        SELECT p.nombre, p.descripcion, p.precio, p.disponibilidad
+        SELECT p.nombre, p.descripcion, p.precio, p.disponibilidad,
+               c.nombre AS categoria, u.nombre AS unidad
         FROM productos p
+        JOIN categorias c ON p.categoria_id = c.id
+        JOIN unidades u ON p.unidad_id = u.id
         ORDER BY p.nombre
     ''')
-    lista = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return render_template('productos.html', lista=lista)
 
     lista = cursor.fetchall()
     cursor.close()
     conn.close()
     return render_template('productos.html', lista=lista)
+
+
+
 
 @app.route('/agregar_menu', methods=['GET', 'POST'])
 def agregar_menu():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute('SELECT id, nombre FROM productos')
+    cursor.execute('SELECT id, descripcion, nombre FROM productos')
     productos = cursor.fetchall()
 
     if request.method == 'POST':
@@ -54,7 +56,7 @@ def agregar_menu():
         fecha = request.form['fecha']
 
         cursor.execute('''
-            INSERT INTO menu_del_dia (producto_id, fecha) 
+            INSERT INTO menu_del_dia (producto_id,precio_menu, fecha) 
             VALUES (%s, %s)
         ''', (producto_id, fecha))
 
