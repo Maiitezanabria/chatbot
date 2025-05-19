@@ -20,6 +20,24 @@ app = Flask(__name__)
 def get_db_connection():
     conn = psycopg2.connect(DATABASE_URL, client_encoding='UTF8')
     return conn
+@app.route('/productos')
+def productos():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        SELECT p.nombre, p.descripcion, p.precio, p.disponibilidad,
+               c.nombre AS categoria, u.nombre AS unidad
+        FROM productos p
+        JOIN categorias c ON p.categoria_id = c.id
+        JOIN unidades u ON p.unidad_id = u.id
+        ORDER BY p.nombre
+    ''')
+
+    lista = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('productos.html', lista=lista)
 
 from collections import defaultdict
 
@@ -77,22 +95,7 @@ def agregar_menu():
     conn.close()
     return render_template('agregar_menu.html', productos=productos)
 
-@app.route('/panel')
-def panel():
-    conn = get_db_connection()
-    cursor = conn.cursor()
 
-    cursor.execute('''
-        SELECT m.id, p.nombre, m.fecha
-        FROM menu_del_dia m
-        JOIN productos p ON m.producto_id = p.id
-        ORDER BY m.fecha DESC
-    ''')
-    menus = cursor.fetchall()
-
-    cursor.close()
-    conn.close()
-    return render_template('panel.html', menus=menus)
 
 @app.route('/eliminar_menu/<int:id>', methods=['POST'])
 def eliminar_menu(id):
