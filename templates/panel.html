@@ -5,30 +5,36 @@
     <title>Panel del Menú del Día</title>
 </head>
 <body>
-   <h1>Menú del día</h1>
-<table border="1">
-    <tr>
-        <th>Producto</th>
-        <th>Descripción</th>
-        <th>Opciones (unidad / precio)</th>
-        <th>Fecha</th>
-    </tr>
-    {% for key, opciones in menus.items() %}
-    <tr>
-        <td>{{ key[0] }}</td> <!-- Nombre -->
-        <td>{{ key[1] }}</td> <!-- Descripción -->
-        <td>
-            <ul>
-                {% for op in opciones %}
-                <li>{{ op.unidad }} - ${{ "%.2f"|format(op.precio) }}</li>
-                {% endfor %}
-            </ul>
-        </td>
-        <td>{{ opciones[0].fecha }}</td> <!-- Asumimos que tienen la misma fecha -->
-    </tr>
-    {% endfor %}
-</table>
-
+    <h1>Menú del día</h1>
+    <table border="1">
+        <tr>
+            <th>Producto</th>
+            <th>Descripción</th>
+            <th>Opciones (unidad / precio)</th>
+            <th>Fecha</th>
+            <th>Acción</th>
+        </tr>
+        {% for key, opciones in menus.items() %}
+        <tr>
+            <td>{{ key[0] }}</td>
+            <td>{{ key[1] }}</td>
+            <td>
+                <ul>
+                    {% for op in opciones %}
+                    <li>{{ op.unidad }} - ${{ "%.2f"|format(op.precio) }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>{{ opciones[0].fecha }}</td>
+            <td>
+                <form method="post" action="/eliminar_menu/{{ opciones[0].menu_id }}">
+                    <button type="submit">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
     <a href="/agregar_menu">Agregar nuevo menú</a> |
     <a href="/">Volver al inicio</a>
 </body>
