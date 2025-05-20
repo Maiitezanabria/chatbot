@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: rotiseria_chatbot
+    name: rotiseria_db
     env: python
     buildCommand: ""
     startCommand: gunicorn app:app
@@ -10,5 +10,5 @@ services:
           name: rotiseria_db
           property: connectionString
 databases:
-  - name: rotiseria-db
+  - name: rotiseria_db
     plan: free
