@@ -106,11 +106,12 @@ def agregar_menu():
     if request.method == 'POST':
         producto_id = request.form['producto_id']
         fecha = request.form['fecha']
+        precio = request.form['precio']
 
         cursor.execute('''
-            INSERT INTO menu_del_dia (producto_id, fecha)
+            INSERT INTO menu_del_dia (producto_id,precio_menu, fecha)
             VALUES (%s, %s)
-        ''', (producto_id, fecha))
+        ''', (producto_id,precio, fecha))
         conn.commit()
         cursor.close()
         conn.close()

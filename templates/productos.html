@@ -2,45 +2,75 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Productos</title>
+    <title>Lista de productos</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        input[type="number"], select {
+            width: 100px;
+        }
+        button {
+            padding: 5px 10px;
+            background-color: #d35400;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #e67e22;
+        }
+    </style>
 </head>
 <body>
     <h1>Lista de productos</h1>
-    <form method="post" action="/productos">
-        <table border="1">
+
+    <form method="POST" action="/productos/editar">
+    <table>
+        <thead>
             <tr>
                 <th>Nombre</th>
                 <th>Descripción</th>
-                <th>Precio</th>
-                <th>Disponible</th>
                 <th>Categoría</th>
                 <th>Unidad</th>
-                <th>Acción</th>
+                <th>Precio ($)</th>
+                <th>Disponible</th>
+                <th>Guardar</th>
             </tr>
+        </thead>
+        <tbody>
             {% for p in lista %}
             <tr>
-                <td>{{ p.id }}</td>
-                <td>{{ p.nombre }}</td>
-                <td>{{ p.descripcion }}</td>
+                <td>{{ p[0] }}</td> <!-- Nombre -->
+                <td>{{ p[1] }}</td> <!-- Descripción -->
+                <td>{{ p[4] }}</td> <!-- Categoría -->
+                <td>{{ p[5] }}</td> <!-- Unidad -->
                 <td>
-                    <input type="number" step="0.01" name="precio_{{ p.id }}" value="{{ p.precio }}">
+                    <input type="number" name="precio_{{ p[6] }}" value="{{ p[2] }}" step="0.01" min="0" required>
                 </td>
                 <td>
-                    <select name="disponibilidad_{{ p.id }}">
-                        <option value="true" {% if p.disponibilidad %}selected{% endif %}>Sí</option>
-                        <option value="false" {% if not p.disponibilidad %}selected{% endif %}>No</option>
+                    <select name="disponibilidad_{{ p[6] }}">
+                        <option value="true" {% if p[3] %}selected{% endif %}>Sí</option>
+                        <option value="false" {% if not p[3] %}selected{% endif %}>No</option>
                     </select>
                 </td>
-                <td>{{ p.categoria }}</td>
-                <td>{{ p.unidad }}</td>
                 <td>
-                    <button type="submit" name="guardar" value="{{ p.id }}">Guardar</button>
+                    <button type="submit" name="guardar" value="{{ p[6] }}">Guardar</button>
                 </td>
             </tr>
             {% endfor %}
-        </table>
+        </tbody>
+    </table>
     </form>
-    <br>
+
     <a href="/">Volver al inicio</a>
 </body>
 </html>
