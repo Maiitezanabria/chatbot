@@ -3,6 +3,7 @@ import psycopg2
 import os
 from dotenv import load_dotenv
 from collections import defaultdict
+import json
 
 # Cargar variables de entorno desde .env
 load_dotenv()
@@ -26,46 +27,36 @@ def productos():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Guardar cambios si hay POST
     if request.method == 'POST':
-        producto_id = request.form['guardar']
-        nuevo_precio = request.form[f'precio_{producto_id}']
-        nueva_disponibilidad = request.form[f'disponibilidad_{producto_id}'] == 'true'
+        # Actualizar precio y disponibilidad de productos
+        for key in request.form:
+            if key.startswith('precio_'):
+                producto_id = key.split('_')[1]
+                precio = request.form[key]
+                disponibilidad_str = request.form.get(f'disponibilidad_{producto_id}', 'false')
+                disponibilidad = True if disponibilidad_str == 'true' else False
 
-        cursor.execute('''
-            UPDATE productos
-            SET precio = %s, disponibilidad = %s
-            WHERE id = %s
-        ''', (nuevo_precio, nueva_disponibilidad, producto_id))
+                cursor.execute('''
+                    UPDATE productos
+                    SET precio = %s, disponibilidad = %s
+                    WHERE id = %s
+                ''', (precio, disponibilidad, producto_id))
         conn.commit()
 
-    # Obtener lista actualizada de productos
     cursor.execute('''
-        SELECT p.id, p.nombre, p.descripcion, p.precio, p.disponibilidad,
-               c.nombre AS categoria, u.nombre AS unidad
+        SELECT p.nombre, p.descripcion, p.precio, p.disponibilidad,
+               c.nombre AS categoria, u.nombre AS unidad, p.id
         FROM productos p
         JOIN categorias c ON p.categoria_id = c.id
         JOIN unidades u ON p.unidad_id = u.id
         ORDER BY p.nombre
     ''')
+
     lista = cursor.fetchall()
-
-    # Convertir a lista de diccionarios para más claridad en Jinja
-    productos_list = []
-    for row in lista:
-        productos_list.append({
-            'id': row[0],
-            'nombre': row[1],
-            'descripcion': row[2],
-            'precio': row[3],
-            'disponibilidad': row[4],
-            'categoria': row[5],
-            'unidad': row[6]
-        })
-
     cursor.close()
     conn.close()
-    return render_template('productos.html', lista=productos_list)
+
+    return render_template('productos.html', lista=lista)
 
 # -------------------- MENÚ DEL DÍA --------------------
 
@@ -75,7 +66,7 @@ def panel():
     cursor = conn.cursor()
 
     cursor.execute('''
-        SELECT m.id, p.nombre, p.descripcion, u.nombre AS unidad, p.precio, m.fecha
+        SELECT m.id, p.nombre, p.descripcion, u.nombre AS unidad, m.precio_menu, m.fecha
         FROM menu_del_dia m
         JOIN productos p ON m.producto_id = p.id
         JOIN unidades u ON p.unidad_id = u.id
@@ -87,11 +78,11 @@ def panel():
 
     # Agrupar por nombre y descripción
     menus = defaultdict(list)
-    for menu_id, nombre, descripcion, unidad, precio, fecha in rows:
+    for menu_id, nombre, descripcion, unidad, precio_menu, fecha in rows:
         key = (nombre, descripcion)
         menus[key].append({
             'unidad': unidad,
-            'precio': precio,
+            'precio_menu': precio_menu,
             'fecha': fecha,
             'menu_id': menu_id
         })
@@ -103,25 +94,38 @@ def agregar_menu():
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    cursor.execute('SELECT id, nombre, descripcion, precio FROM productos')
+    productos_raw = cursor.fetchall()
+
+    # Convertir a lista de dicts para facilitar JS
+    productos = []
+    for p in productos_raw:
+        productos.append({
+            'id': p[0],
+            'nombre': p[1],
+            'descripcion': p[2],
+            'precio': float(p[3])
+        })
+
     if request.method == 'POST':
         producto_id = request.form['producto_id']
         fecha = request.form['fecha']
-        precio = request.form['precio']
+        precio_menu = request.form['precio_menu']
 
         cursor.execute('''
-            INSERT INTO menu_del_dia (producto_id,precio_menu, fecha)
-            VALUES (%s, %s)
-        ''', (producto_id,precio, fecha))
+            INSERT INTO menu_del_dia (producto_id, precio_menu, fecha)
+            VALUES (%s, %s, %s)
+        ''', (producto_id, precio_menu, fecha))
+
         conn.commit()
         cursor.close()
         conn.close()
         return redirect('/panel')
 
-    cursor.execute('SELECT id, descripcion, nombre FROM productos ORDER BY nombre')
-    productos = cursor.fetchall()
     cursor.close()
     conn.close()
-    return render_template('agregar_menu.html', productos=productos)
+
+    return render_template('agregar_menu.html', productos=productos, productos_json=json.dumps(productos))
 
 @app.route('/eliminar_menu/<int:id>', methods=['POST'])
 def eliminar_menu(id):
