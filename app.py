@@ -59,14 +59,22 @@ def verificar_webhook():
 def webhook():
     data = request.get_json()
     try:
-        mensaje = data['entry'][0]['changes'][0]['value']['messages'][0]['text']['body']
+        mensaje = data['entry'][0]['changes'][0]['value']['messages'][0]['text']['body'].strip().lower()
         telefono = data['entry'][0]['changes'][0]['value']['messages'][0]['from']
         print(f"Mensaje recibido: {mensaje} de {telefono}")
 
+        saludos = ['hola', 'buenas', 'qué tal', 'buen día', 'buenas tardes', 'buenas noches']
+
+        if mensaje in saludos:
+            respuesta = "¡Hola! Bienvenido a Sabor Casero. Puedes preguntarme por la disponibilidad de nuestros productos o el menú del día."
+            enviar_mensaje(telefono, respuesta)
+            return 'ok', 200
+
+        # Si no es saludo, hacer la consulta normal en la base de datos
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        cursor.execute("SELECT id, disponibilidad FROM productos WHERE LOWER(nombre) = LOWER(%s)", (mensaje,))
+        cursor.execute("SELECT id, disponibilidad FROM productos WHERE LOWER(nombre) = %s", (mensaje,))
         producto = cursor.fetchone()
 
         if producto:
@@ -80,7 +88,7 @@ def webhook():
             cursor.execute('''
                 SELECT p.nombre FROM menu_del_dia m
                 JOIN productos p ON p.id = m.producto_id
-                WHERE LOWER(p.nombre) = LOWER(%s) AND m.fecha = %s
+                WHERE LOWER(p.nombre) = %s AND m.fecha = %s
             ''', (mensaje, hoy))
             menu = cursor.fetchone()
 
