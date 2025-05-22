@@ -16,7 +16,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # === CONFIGURACIÓN DE WHATSAPP (API de Meta) ===
 PHONE_NUMBER_ID = '713498288506815'
 ACCESS_TOKEN = 'EAAQJEkpZAsEYBO9qZBkkGZAceDp2iazFqVZCZBWo7AYZB2hc3eJP9uETod0hNJlHDl7cfcnZAgFZCWgSypCiJHHJSWoZBzDa9VqCtHIdcbKtdE7riFUR3giAX1g6myZAkECpDGXJPOZCWih6R7YVJcosURkL4MjhQLZBrGYAxrZAZCB8ctjnnyKBEqO1zYNUmwoNyHZAiei5qsx5BDHxZBEimw18ZCIu0NW1sGCcZD'
-WHATSAPP_API_URL = f'https://graph.facebook.com/v17.0/{PHONE_NUMBER_ID}/messages'
+WHATSAPP_API_URL = f'https://graph.facebook.com/v22.0/713498288506815/messages'
 HEADERS = {
     'Authorization': f'Bearer {ACCESS_TOKEN}',
     'Content-Type': 'application/json'
