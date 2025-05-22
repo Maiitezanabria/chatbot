@@ -63,48 +63,15 @@ def webhook():
         telefono = data['entry'][0]['changes'][0]['value']['messages'][0]['from']
         print(f"Mensaje recibido: {mensaje} de {telefono}")
 
-        saludos = ['hola', 'buenas', 'qué tal', 'buen día', 'buenas tardes', 'buenas noches']
-
-        if mensaje in saludos:
-            respuesta = "¡Hola! Bienvenido a Sabor Casero. Puedes preguntarme por la disponibilidad de nuestros productos o el menú del día."
-            enviar_mensaje(telefono, respuesta)
-            return 'ok', 200
-
-        # Si no es saludo, hacer la consulta normal en la base de datos
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        cursor.execute("SELECT id, disponibilidad FROM productos WHERE LOWER(nombre) = %s", (mensaje,))
-        producto = cursor.fetchone()
-
-        if producto:
-            disponible = producto[1]
-            if disponible:
-                respuesta = f"✅ Sí, el producto *{mensaje}* está disponible."
-            else:
-                respuesta = f"❌ El producto *{mensaje}* no está disponible en este momento."
-        else:
-            hoy = date.today()
-            cursor.execute('''
-                SELECT p.nombre FROM menu_del_dia m
-                JOIN productos p ON p.id = m.producto_id
-                WHERE LOWER(p.nombre) = %s AND m.fecha = %s
-            ''', (mensaje, hoy))
-            menu = cursor.fetchone()
-
-            if menu:
-                respuesta = f"📋 El producto *{mensaje}* está en el *menú del día* hoy."
-            else:
-                respuesta = f"😕 No encontramos el producto *{mensaje}* ni está en el menú del día."
-
+        # RESPUESTA FIJA "hola"
+        respuesta = "hola"
         enviar_mensaje(telefono, respuesta)
-        cursor.close()
-        conn.close()
 
     except Exception as e:
         print("Error al procesar mensaje:", e)
 
     return 'ok', 200
+
 
 # === PANEL DEL DUEÑO ===
 
