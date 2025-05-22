@@ -15,7 +15,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 # === CONFIGURACIÓN DE WHATSAPP (API de Meta) ===
 PHONE_NUMBER_ID = '713498288506815'
-ACCESS_TOKEN = 'EAATbmmYZAMZCIBOx6GCW8rOoD18ds0nkDzdtojyjXXpjeYsAz9M4c08WNsZAJu1KFCciFUFeJLtF3jmmtWCz4g1DHfDsMLwYrzjZAwq7VdMfubdDvv184hGZBPrV1Xbh3fKiV8JkYBmvzZCtdDjBnf655rXdzPkUi4l1ZBumsiMuQdeIQ6FPapc9nY4rapgzzeWKZAyEsyYeW9eA9lOpZAZCgKK4EP2kwZD'
+ACCESS_TOKEN = 'EAAQJEkpZAsEYBO9qZBkkGZAceDp2iazFqVZCZBWo7AYZB2hc3eJP9uETod0hNJlHDl7cfcnZAgFZCWgSypCiJHHJSWoZBzDa9VqCtHIdcbKtdE7riFUR3giAX1g6myZAkECpDGXJPOZCWih6R7YVJcosURkL4MjhQLZBrGYAxrZAZCB8ctjnnyKBEqO1zYNUmwoNyHZAiei5qsx5BDHxZBEimw18ZCIu0NW1sGCcZD'
 WHATSAPP_API_URL = f'https://graph.facebook.com/v17.0/{PHONE_NUMBER_ID}/messages'
 HEADERS = {
     'Authorization': f'Bearer {ACCESS_TOKEN}',
@@ -169,6 +169,15 @@ def eliminar_menu(id):
     cursor.close()
     conn.close()
     return redirect('/panel')
+
+@app.route('/terminos')
+def terminos():
+    return render_template('terminos.html')
+
+@app.route('/privacidad')
+def privacidad():
+    return render_template('privacidad.html')
+
 
 # === EJECUCIÓN DEL SERVIDOR ===
 if __name__ == '__main__':
