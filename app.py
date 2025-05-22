@@ -63,14 +63,19 @@ def webhook():
         telefono = data['entry'][0]['changes'][0]['value']['messages'][0]['from']
         print(f"Mensaje recibido: {mensaje} de {telefono}")
 
-        # RESPUESTA FIJA "hola"
-        respuesta = "hola"
-        enviar_mensaje(telefono, respuesta)
+        if mensaje == "hola":
+            respuesta = (
+                "¡Hola! 👋 Bienvenido a *Sabor Casero*.\n"
+                "Podés consultar el menú del día, ver los productos disponibles o hacer un pedido.\n"
+                "¿Qué te gustaría hacer hoy?"
+            )
+            enviar_mensaje(telefono, respuesta)
 
     except Exception as e:
         print("Error al procesar mensaje:", e)
 
     return 'ok', 200
+
 
 
 # === PANEL DEL DUEÑO ===
